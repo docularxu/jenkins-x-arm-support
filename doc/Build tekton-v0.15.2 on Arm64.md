@@ -11,8 +11,10 @@ The build is run natively on Arm64 machines. The server used is:
 * update go proxy and environment
 * set GOPATH
 # Build tekton
-` git clone  -b v0.15.2 https://github.com/tektoncd/pipeline.git`
-`cd pipeline`
+```
+git clone  -b v0.15.2 https://github.com/tektoncd/pipeline.git
+cd pipeline
+```
 delete __lint__ in the Makefile 
 
 ```
