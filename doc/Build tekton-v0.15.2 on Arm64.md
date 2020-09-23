@@ -1,21 +1,50 @@
 # Build tekton-v0.15.2 on Arm64
-This document how to build tekton-v.15.2 on Arm64
+This document how to build tekton-v.15.2 on Arm64.
+
+The main reference is:
+
+* https://github.com/tektoncd/pipeline/blob/master/docs/install.md
+
+* https://github.com/jenkins-x-charts/tekton/blob/master/tekton/README.md
+
 # Environment
 The build is run natively on Arm64 machines. The server used is:
 -Memory : 32 G
 -CPU: 32 cores
+
 # prerequisites
 * install go  version>=1.13.8
+
+  For arm64, follow this link to download Go 1.13.8 and get an installation instruction:
+
+  https://golang.google.cn/dl/go1.13.8.linux-arm64.tar.gz
+
 * install Pre-commit
+
+  I used pip. Other installation methods exist as well.
+
+  `$ pip install pre-commit`
+
 * install Dep
+
+  https://github.com/golang/dep
+
 * update go proxy and environment
+
+  If your area can not access Google,you should set go proxy
+
+  `$ go env -w GO111MODULE=on`
+  `$ go env -w GOPROXY=https://goproxy.io,direct`
+
 * set GOPATH
+
+  `$ export GOPATH=your file`
 # Build tekton
 ```
 git clone  -b v0.15.2 https://github.com/tektoncd/pipeline.git
 cd pipeline
 ```
-delete __lint__ in the Makefile 
+i do not download package lint ,  lint juse check code ,so  i  delete __lint__ in the Makefile 
 
 ```
 .PHONY: all     
@@ -25,6 +54,8 @@ $Q $(GO) build \
 -ldflags '-X $(MODULE)/cmd.Version=$(VERSION) -X $(  MODULE)/cmd.BuildDate=$(DATE)' \   
 -o $(BIN)/$(basename $(MODULE)) main.go
 ```
+After the above commands finish, you can check the build result as below.
+
 ```
 ls cmd
 controller  creds-init  entrypoint  git-init  imagedigestexporter  kubeconfigwriter  nop  pullrequest-init  webhook
@@ -95,9 +126,14 @@ ls .bin/github.com/tektoncd/pipeline
 .bin/github.com/tektoncd/pipeline
 ```
 
+Now ,all binary files are  built.
 
-Now ,all binary file is built.
+There are 
+
+controller,  creds-init , entrypoint , gcs-fetcher , git-init,  imagedigestexporter,  kubeconfigwriter , nop , pullrequest-init,  webhook.
+
 next , building container images ,then deploying tekton  with helm
+
 # build images 
 the controller Dockerfile
 using ubuntu18.04 as base image
@@ -116,8 +152,8 @@ docker build -t controller:0.15.2-arm64 .
 # deploy on cluster
 
 `git clone https://github.com/jenkins-x-charts/tekton `
-`cd tekton/tenton`
-change the values.yaml,modify that yaml file to use the container image name + tag for the image you want to test on your cluster,such as
+`cd tekton/tekton`
+change the values.yaml,modify that yaml file to use the container image name + tag  for the image you just built on your cluster,such as
 
 ```
 image:

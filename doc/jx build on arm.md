@@ -23,6 +23,7 @@ I used pip. Other installation methods exist as well.
 `$ pip install pre-commit`
 `$ pre-commit --version`
 `pre-commit 1.21.0`
+
 # Install Dep
 
 [https://github.com/golang/dep](https://github.com/golang/dep)[](https://github.com/golang/dep)
