@@ -9,10 +9,35 @@ The build is run natively on Arm64 machines. The server used is:
 
 # prerequisites
 * install go  version>=1.13.8
+
+  For arm64, follow this link to download Go 1.13.8 
+
+  https://golang.google.cn/dl/go1.13.8.linux-arm64.tar.gz
+
+  Download the archive and extract it.
+
 * install Pre-commit
+
+  I used pip. Other installation methods exist as well.
+
+  `$ pip install pre-commit`
+
 * install Dep
+
+  follow this link to install:
+
+  https://github.com/golang/dep
+
 * update go proxy and environment
+
+  If your area can not access Google,you should set go proxy
+
+  `$ go env -w GO111MODULE=on`
+  `$ go env -w GOPROXY=https://goproxy.io,direct`
+
 * set GOPATH
+
+  `$ export GOPATH=your file`
 
 # Build lighthouse
 
@@ -39,7 +64,12 @@ go: finding github.com/go-logr/logr v0.1.0
 go: finding gopkg.in/fsnotify.v1 v1.4.7
 GO111MODULE=on go build -i -ldflags "-X github.com/jenkins-x/lighthouse/pkg/version.Version='0.0.769-dev+a7d56689'" -o bin/lighthouse-tekton-controller cmd/tektoncontroller/main.go
 GO111MODULE=on go build -i -ldflags "-X github.com/jenkins-x/lighthouse/pkg/version.Version='0.0.769-dev+a7d56689'" -o bin/gc-jobs cmd/gc/main.go
-$ ll bin
+```
+
+Now ,all binary file has been built in folder __bin__, you can see it .
+
+```
+$ ls -l  bin
 total 225308
 drwxr-xr-x  2 root root     4096 Sep  7 11:13 ./
 drwxr-xr-x 12 kong kong     4096 Sep  7 11:12 ../
@@ -50,7 +80,9 @@ drwxr-xr-x 12 kong kong     4096 Sep  7 11:12 ../
 -rwxr-xr-x  1 root root 47966110 Sep  7 11:12 webhooks*
 ```
 
-Now ,all binary file has been built.
+There are 
+
+__foghorn, gc-jobs,keeper,lighthouse-tekton-controller,webhooks.__
 
 next , building container images ,then deploying tekton  with helm
 # build images 
@@ -66,21 +98,20 @@ ENV JX_HOME /jxhome
 ENTRYPOINT ["/foghorn"]
 ```
 
-Other dockerfile is similar,just change the  file path and name .
+Other dockerfile is similar.
 
-docker build -t lighthouse-foghorn:0.0.738  .
+Here is an example of what I used,You can refer to the following link:https://github.com/yyunk/jenkins-x-arm-support/tree/master/doc/lighthouse
 
 # deploy on cluster
 
 ```
 git clone https://github.com/jenkins-x/lighthouse/tree/master/charts/lighthouse
-
 cd lighthouse/charts
 ```
 
 change the values.yaml,modify that yaml file to use the container image you build.
 
-such as this :
+Here is an example of what I used in my arm64 server.You can refer to the following link
 
 https://github.com/yyunk/jenkins-x-arm-support/blob/master/yaml/lighthouse-myvalues.yaml
 
@@ -90,4 +121,14 @@ Then run:
 
 # Success criteria
 is when both helm charts can be installed and the `Deployment` resources create pods which startup, start Running and don't fail / restart for 5 minutes. That means that the pods startup and don't fail basically.
+You can use command to see it 
+
 `kubectl get pod -w`
+
+```
+lighthouse-foghorn-575576ff5d-6j9tz                          1/1     Running            1         1h
+lighthouse-keeper-57f7997d86-9bmfm                           1/1     Running            1         1h
+lighthouse-tekton-controller-6cb84565f7-xxr7f                1/1     Running            0         1h
+lighthouse-webhooks-65c857664b-ttfc9                         1/1     Running            1          1h
+```
+

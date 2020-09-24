@@ -15,9 +15,11 @@ The build is run natively on Arm64 machines. The server used is:
 # prerequisites
 * install go  version>=1.13.8
 
-  For arm64, follow this link to download Go 1.13.8 and get an installation instruction:
+  For arm64, follow this link to download Go 1.13.8 :
 
   https://golang.google.cn/dl/go1.13.8.linux-arm64.tar.gz
+
+  Download the archive and extract it.
 
 * install Pre-commit
 
@@ -26,6 +28,8 @@ The build is run natively on Arm64 machines. The server used is:
   `$ pip install pre-commit`
 
 * install Dep
+
+  follow this link to install:
 
   https://github.com/golang/dep
 
@@ -44,115 +48,63 @@ The build is run natively on Arm64 machines. The server used is:
 git clone  -b v0.15.2 https://github.com/tektoncd/pipeline.git
 cd pipeline
 ```
-i do not download package lint ,  lint juse check code ,so  i  delete __lint__ in the Makefile 
+Golint is a linter for Go source code, golint prints out style mistakes .i did not download  Golint ,  so  i  delete __lint__ in the Makefile.
 
-```
-.PHONY: all     
-all: fmt lint | $(BIN) ; $(info $(M) building executable…) @ ## Build program binary  
-$Q $(GO) build \  
--tags release \
--ldflags '-X $(MODULE)/cmd.Version=$(VERSION) -X $(  MODULE)/cmd.BuildDate=$(DATE)' \   
--o $(BIN)/$(basename $(MODULE)) main.go
-```
-After the above commands finish, you can check the build result as below.
+Because some binary can be built not only by main.go,i change the main.go in Makefile to *.go . So it can build binary  by all  Source code Include in folder.
 
-```
-ls cmd
-controller  creds-init  entrypoint  git-init  imagedigestexporter  kubeconfigwriter  nop  pullrequest-init  webhook
-for i in `realpath cmd/*`; do cd $i; make -f ../../Makefile all; done
+ Here is an example of what I  changed in the Makefile You can refer to the following link: https://github.com/yyunk/jenkins-x-arm-support/blob/master/doc/pipeline/Makefile#L24
 
-ls cmd/*/.bin/github.com/tektoncd
-cmd/controller/.bin/github.com/tektoncd:
-pipeline
-cmd/creds-init/.bin/github.com/tektoncd:
-pipeline
-cmd/git-init/.bin/github.com/tektoncd:
-pipeline
-cmd/kubeconfigwriter/.bin/github.com/tektoncd:
-pipeline
-cmd/nop/.bin/github.com/tektoncd:
-pipeline
-cmd/pullrequest-init/.bin/github.com/tektoncd:
-pipeline
-cmd/webhook/.bin/github.com/tektoncd:
-pipeline
-```
+After changing the Makefile, you can enter the  cmd folder,then you can see some folder.
 
+__controller  ,creds-init  ,entrypoint  ,git-init  ,imagedigestexporter , kubeconfigwriter  ,nop , pullrequest-init , webhook.__
 
-When build entrypoint ,edit the Makefile,add __post_writer.go  runner.go  waiter.go__ 
-```
-.PHONY: all
-all: fmt  | $(BIN) ; $(info $(M) building executable…) @ ## Build program binary
-$Q $(GO) build \
--tags release \
--ldflags '-X $(MODULE)/cmd.Version=$(VERSION) -X $(MODULE)/cmd.BuildDate=$(DATE)' \
--o $(BIN)/$(basename $(MODULE)) main.go post_writer.go  runner.go  waiter.go
-```
-```
-$ cd entrypoint 
-$ make -f ../../Makefile all
-🐱 running gofmt…
-🐱 building executable…
-ll .bin/github.com/tektoncd/pipeline
--rwxr-xr-x 1 root root 36277501 Sep  7 10:43 .bin/github.com/tektoncd/pipeline*
-```
-When build  imagedigestexporter,edit the Makefile,add  __digest.go__ 
-```
-.PHONY: all
-all: fmt  | $(BIN) ; $(info $(M) building executable…) @ ## Build program binary
-$Q $(GO) build \
--tags release \
--ldflags '-X $(MODULE)/cmd.Version=$(VERSION) -X $(MODULE)/cmd.BuildDate=$(DATE)' \
--o $(BIN)/$(basename $(MODULE)) main.go post_writer.go  runner.go  waiter.go
-```
-```
-$ cd  imagedigestexporter
-$ make -f ../../Makefile all
-🐱 running gofmt…
-🐱 building executable…
-ll .bin/github.com/tektoncd/pipeline
--rwxr-xr-x 1 root root 36277501 Sep  7 10:43 .bin/github.com/tektoncd/pipeline*
-```
+Enter each  folder ,and Enter command `$make -f ../../Makefile all` ,the binary  can be built.
 
-When build  gcs-fetcher ,recovery the Makefile
+Or you can just use shell script 
 
-```
+```for i in `realpath cmd/*`; do cd $i; make -f ../../Makefile all; done```
+
+The binary  file is in  cmd/*/.bin/github.com/tektoncd/pipeline.
+
+When build  gcs-fetcher,you should enter another folder
+
+```shell
 cd pipeline/vendor/github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/cmd/gcs-fetcher
 make -f pipeline/Makefile all
-🐱 running gofmt…
-go: not formatting packages in dependency modules
-🐱 building executable…
-ls .bin/github.com/tektoncd/pipeline
-.bin/github.com/tektoncd/pipeline
 ```
 
 Now ,all binary files are  built.
 
 There are 
 
-controller,  creds-init , entrypoint , gcs-fetcher , git-init,  imagedigestexporter,  kubeconfigwriter , nop , pullrequest-init,  webhook.
+__controller,  creds-init , entrypoint , gcs-fetcher , git-init,  imagedigestexporter,  kubeconfigwriter , nop , pullrequest-init,  webhook__
 
-next , building container images ,then deploying tekton  with helm
+next , building container images ,then deploying tekton  with helm.
 
 # build images 
 the controller Dockerfile
 using ubuntu18.04 as base image
+
 ```
 FROM ubuntu:18.04
-RUN  apt-get update &&  apt install openssh-client -y
+RUN  apt-get update &&  apt install openssh-client git -y
 RUN mkdir /ko-app
 COPY ./pipeline  /ko-app/controller
 ENTRYPOINT ["/ko-app/controller"]
 ````
 
-Other dockerfile is similar,just change the  file path and name .
-But must copy file in /ko-app.
-docker build -t controller:0.15.2-arm64 .
+Other dockerfile is similar.
+
+Here is an example of what I used,You can refer to the following link: https://github.com/yyunk/jenkins-x-arm-support/tree/master/doc/pipeline
+
 
 # deploy on cluster
 
-`git clone https://github.com/jenkins-x-charts/tekton `
-`cd tekton/tekton`
+```
+git clone https://github.com/jenkins-x-charts/tekton 
+cd tekton/tekton
+```
+
 change the values.yaml,modify that yaml file to use the container image name + tag  for the image you just built on your cluster,such as
 
 ```
@@ -168,10 +120,21 @@ image:
   imagedigestexporter: imagedigestexporter
   gcsfetcher: gcs-fetcher
 ```
+Here is an example of what I used in my arm64 server.You can refer to the following link:
+
 https://github.com/yyunk/jenkins-x-arm-support/blob/master/yaml/tekton-myvalues.yaml
 
 `helm upgrade tekton tekton --install --values myvalues.yaml`
 
 # Success criteria
-is when both helm charts can be installed and the `Deployment` resources create pods which startup, start Running and don't fail / restart for 5 minutes. That means that the pods startup and don't fail basically.
-`kubectl get pod -w`
+When both helm charts can be installed and the `Deployment` resources create pods which startup, start Running and don't fail / restart for 5 minutes. That means that the pods startup and don't fail basically.
+You can use command to see it 
+
+`kubectl get pod -w` 
+
+```
+tekton-pipelines-controller-68487d8d5c-f6q5g                 1/1     Running            0          1h
+tekton-pipelines-webhook-6cff968fb9-6b6rm                    1/1     Running            0         1h
+
+```
+
