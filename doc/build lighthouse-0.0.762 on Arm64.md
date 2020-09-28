@@ -69,7 +69,7 @@ GO111MODULE=on go build -i -ldflags "-X github.com/jenkins-x/lighthouse/pkg/vers
 GO111MODULE=on go build -i -ldflags "-X github.com/jenkins-x/lighthouse/pkg/version.Version='0.0.769-dev+a7d56689'" -o bin/gc-jobs cmd/gc/main.go
 ```
 
-Now ,all binary file has been built in folder `bin`, you can see them.
+Now, all binary file has been built in folder `bin`, you can see them.
 
 ```
 $ ls -l bin
@@ -83,7 +83,7 @@ drwxr-xr-x 12 kong kong     4096 Sep  7 11:12 ../
 -rwxr-xr-x  1 root root 47966110 Sep  7 11:12 webhooks*
 ```
 
-Next , building container images, then deploying tekton  with helm
+Next, packing these binary files into docker container images.
 # Build container images 
 The foghorn Dockerfile using ubuntu18.04 as base image
 
@@ -104,9 +104,7 @@ $ docker build -f Dockerfile_foghorn -t lighthouse-foghorn:0.0.738 .
 
 Other dockerfile is similar.
 
-Here is an example of what I used,You can refer to the following link: https://github.com/yyunk/jenkins-x-arm-support/tree/master/doc/lighthouse
-
-You should build container images by binary files which are built by source code.
+Here is an example of what I used,You can refer to the following link: https://github.com/yyunk/jenkins-x-arm-support/tree/master/doc/lighthouse       
 
 I built these container images:
 
@@ -125,7 +123,7 @@ $ git clone https://github.com/jenkins-x/lighthouse/tree/master/charts/lighthous
 $ cd lighthouse/charts
 ```
 
-Change the values.yaml,modify that yaml file to use the container image you build.
+Change the `values.yaml`, modify that yaml file to use the container image you build.
 
 Here is an example of what I used in my arm64 server. You can refer to the following link
 

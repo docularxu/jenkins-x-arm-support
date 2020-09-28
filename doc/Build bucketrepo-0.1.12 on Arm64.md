@@ -115,11 +115,11 @@ $ docker build -t buckerrepo:0.1.12 .
 
 Here is an example of what I used, You can refer to the following link: https://github.com/yyunk/jenkins-x-arm-support/tree/master/doc/bucketrepo
 
-# deploy on cluster
+# Deploy on cluster
 
 Deployment is based on Helm. Helm chart can be found here: https://github.com/jenkins-x/bucketrepo/tree/master/charts/bucketrepo
 
-Change the values.yaml, modify that yaml file to use the container image you build.
+Change the `values.yaml`, modify that yaml file to use the container image you build.
 
 Here is an example of what I used in my arm64 server. You can refer to the following link: https://github.com/yyunk/jenkins-x-arm-support/blob/master/doc/bucketrepo/myvalues.yaml
 
