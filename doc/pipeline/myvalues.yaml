@@ -1,5 +1,5 @@
 image:
-  upstreamtag: arm64
+  upstreamtag: 0.15.2-arm64
   kubeconfigwriter: kubeconfigwriter
   credsinit: creds-init
   gitinit: git-init
