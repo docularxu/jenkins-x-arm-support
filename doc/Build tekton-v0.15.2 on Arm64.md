@@ -8,7 +8,7 @@ The major references of this document are :
 * https://github.com/jenkins-x-charts/tekton/blob/master/tekton/README.md
 
 # Environment
-The build is run natively on aarch64 machines. The server used is:
+The build is run natively on aarch64 machines. The server used is :
 
 - Memory : 32 G
 
@@ -54,9 +54,9 @@ $ cd pipeline
 ```
 ## Modification of Makefile
 
-Golint is a linter for Go source code, golint prints out style mistakes .I did not install Golint successfully, so i delete __lint__ in the Makefile.
+Golint is a linter for Go source code, golint prints out style mistakes. I did not install Golint successfully, so i delete __lint__ in the Makefile.
 
-Because some binary can be built not only by main.go,i change the main.go in Makefile to *.go. So it can build binary by all source code include in folder.
+Because some binary can be built not only by main.go, i change the main.go in Makefile to *.go. So it can build binary by all source code include in folder.
 
 Here is an example of what I changed in the Makefile. You can refer to the following link: https://github.com/yyunk/pipeline/commit/5838ed97c142f49e72f2b68cbecd4ff04acfc6fb
 
