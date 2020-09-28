@@ -1,16 +1,16 @@
-# create kaniko container image
+# Create kaniko container image
 
 This document describes how to build kaniko-v0.20.0 on Arm64  from  the following link: https://github.com/GoogleContainerTools/kaniko
 
 # Environment
 
-The build is run natively on Arm64 machines.   The server used is:   
+The build is run natively on Arm64 machines. The server used is :   
 
--Memory : 32 G  
+- Memory : 32 G  
 
- -CPU: 32 cores  
+- CPU: 32 cores  
 
-# prerequisites
+# Prerequisites
 
 - install go  version>=1.13.8
 
@@ -34,7 +34,7 @@ The build is run natively on Arm64 machines.   The server used is:
 
 - update go proxy and environment
 
-  If your area can not access Google,you should set go proxy
+  Optionally, set up GOPROXY suitable to your development environment.
 
   `$ go env -w GO111MODULE=on`
   `$ go env -w GOPROXY=https://goproxy.io,direct`
@@ -46,26 +46,26 @@ The build is run natively on Arm64 machines.   The server used is:
 # Build kaniko
 
 ```shell
-git clone https://github.com/GoogleContainerTools/kaniko.git
-cd kaniko/cmd/executor/
-mkae -f ../../Makefile
+$ git clone https://github.com/GoogleContainerTools/kaniko.git
+$ cd kaniko/cmd/executor/
+$ mkae -f ../../Makefile
 GOARCH=amd64 GOOS=linux CGO_ENABLED=0 go build -ldflags '-extldflags "-static" -X github.com/GoogleContainerTools/kaniko/pkg/version.version=v1.0.0 -w -s  ' -o out/executor github.com/GoogleContainerTools/kaniko/cmd/executor
 ...
 ```
 
-Now,the binary files are built in folder __out__ .you can see it .
+Now, the binary files are built in folder `out`. You can see it .
 
 ```
-ls out -l
+$ ls out -l
 total 49532
 -rwxr-xr-x 1 root root 50720768 Sep 22 11:25 executor
 ```
 
-next , building container image with the file executor .
+Next, building container image with the file executor.
 
-# build images 
+# Build images 
 
-the knaiko Dockerfile
+The kaniko Dockerfile
 
 ```dockerfile
 FROM ubuntu:18.04
@@ -79,4 +79,4 @@ WORKDIR /workspace
 ENTRYPOINT ["/kaniko/executor"]
 ```
 
-Here is an example of what I used,You can refer to the following link:https://github.com/yyunk/jenkins-x-arm-support/blob/master/doc/knaiko/Dockerfile_kaniko
+Here is an example of what I used, you can refer to the following link:https://github.com/yyunk/jenkins-x-arm-support/blob/master/doc/knaiko/Dockerfile_kaniko
