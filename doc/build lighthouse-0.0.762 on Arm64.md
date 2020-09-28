@@ -97,7 +97,7 @@ ENTRYPOINT ["/foghorn"]
 ```
 
 ```
-docker build -f Dockerfile_foghorn -t lighthouse-foghorn:0.0.738 .
+$ docker build -f Dockerfile_foghorn -t lighthouse-foghorn:0.0.738 .
 ```
 
 
@@ -121,8 +121,8 @@ lighthouse-gc-jobs:0.0.738
 # Deploy on cluster
 
 ```
-git clone https://github.com/jenkins-x/lighthouse/tree/master/charts/lighthouse
-cd lighthouse/charts
+$ git clone https://github.com/jenkins-x/lighthouse/tree/master/charts/lighthouse
+$ cd lighthouse/charts
 ```
 
 Change the values.yaml,modify that yaml file to use the container image you build.
@@ -133,13 +133,13 @@ https://github.com/yyunk/jenkins-x-arm-support/blob/master/doc/lighthouse/myvalu
 
 Then run:
 
-`helm upgrade lighthouse lighthouse --install --values myvalues.yaml`
+`$ helm upgrade lighthouse lighthouse --install --values myvalues.yaml`
 
 # Success criteria
 When helm charts can be installed, the pods' status are Running and don't fail / restart for 5 minutes. That means that the pods startup and don't fail basically.
 You can use command to see it 
 
-`kubectl get pod -w`
+`$ kubectl get pod -w`
 
 ```
 lighthouse-foghorn-575576ff5d-6j9tz                          1/1     Running            1         1h
