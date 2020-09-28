@@ -1,5 +1,5 @@
 # Build tekton-v0.15.2 on Arm64
-This document describes how to build tekton-v.0.15.2 on Arm64.
+This document describes how to build tekton-v0.15.2 on Arm64.
 
 The major references of this document are :
 
@@ -54,9 +54,9 @@ $ cd pipeline
 ```
 ## Modification of Makefile
 
-Golint is a linter for Go source code, golint prints out style mistakes. I did not install Golint successfully, so i delete __lint__ in the Makefile.
+Golint is a linter for Go source code, golint prints out style mistakes. At the moment of this writing, Golint cannot be installed successfully. As it's not crucial to the core function of tekton, here I temporarily removed it from Makefile. For more detail about this issue, see  https://docs.google.com/document/d/1vwsii0WeFaGHE92uBTazyVHKT9kIb-pjkdVQ_0Niwcg/edit?usp=sharing
 
-Because some binary can be built not only by main.go, i change the main.go in Makefile to *.go. So it can build binary by all source code include in folder.
+Because some binary can be built not only by main.go, I change the main.go in Makefile to *.go. So it can build binary by all source code include in folder.
 
 Here is an example of what I changed in the Makefile. You can refer to the following link: https://github.com/yyunk/pipeline/commit/5838ed97c142f49e72f2b68cbecd4ff04acfc6fb
 
@@ -165,7 +165,7 @@ image:
 ```
 Here is an example of what I used in my arm64 server. You can refer to the following link: 
 
-https://github.com/yyunk/jenkins-x-arm-support/blob/master/yaml/tekton-myvalues.yaml
+https://github.com/yyunk/jenkins-x-arm-support/blob/master/doc/pipeline/myvalues.yaml
 
 `$ helm upgrade tekton tekton --install --values myvalues.yaml`
 
