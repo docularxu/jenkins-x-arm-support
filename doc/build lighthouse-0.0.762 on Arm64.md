@@ -85,8 +85,7 @@ drwxr-xr-x 12 kong kong     4096 Sep  7 11:12 ../
 
 Next , building container images, then deploying tekton  with helm
 # Build container images 
-The foghorn Dockerfile
-Using ubuntu18.04 as base image
+The foghorn Dockerfile using ubuntu18.04 as base image
 
 ```
 FROM ubuntu:18.04
