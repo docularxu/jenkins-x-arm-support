@@ -1,14 +1,15 @@
 # build lighthouse-0.0.762 on Arm64 
 
-This document describes how to build lighthouse-0.0.762 on Arm64.The main reference is the build instruction in https://github.com/jenkins-x/lighthouse#building, which is written for and verified on x86-64.
+This document describes how to build lighthouse-0.0.762 on Arm64. The major reference is the build instruction in https://github.com/jenkins-x/lighthouse#building, which is written for and verified on x86-64.
 
 # Environment
-The build is run natively on Arm64 machines. The server used is:
--Memory : 32 G
--CPU: 32 cores
+The build is run natively on aarch64 machines. The server used is :
 
-# prerequisites
-* install go  version>=1.13.8
+- Memory : 32 G
+- CPU : 32 cores
+
+# Prerequisites
+* install go version>=1.13.8
 
   For arm64, follow this link to download Go 1.13.8 
 
@@ -30,10 +31,12 @@ The build is run natively on Arm64 machines. The server used is:
 
 * update go proxy and environment
 
-  If your area can not access Google,you should set go proxy
+  Optionally, set up GOPROXY suitable to your development environment.
 
-  `$ go env -w GO111MODULE=on`
-  `$ go env -w GOPROXY=https://goproxy.io,direct`
+  ```
+  $ go env -w GO111MODULE=on
+  $ go env -w GOPROXY=https://goproxy.io,direct
+  ```
 
 * set GOPATH
 
@@ -66,10 +69,10 @@ GO111MODULE=on go build -i -ldflags "-X github.com/jenkins-x/lighthouse/pkg/vers
 GO111MODULE=on go build -i -ldflags "-X github.com/jenkins-x/lighthouse/pkg/version.Version='0.0.769-dev+a7d56689'" -o bin/gc-jobs cmd/gc/main.go
 ```
 
-Now ,all binary file has been built in folder __bin__, you can see it .
+Now ,all binary file has been built in folder `bin`, you can see them.
 
 ```
-$ ls -l  bin
+$ ls -l bin
 total 225308
 drwxr-xr-x  2 root root     4096 Sep  7 11:13 ./
 drwxr-xr-x 12 kong kong     4096 Sep  7 11:12 ../
@@ -80,14 +83,10 @@ drwxr-xr-x 12 kong kong     4096 Sep  7 11:12 ../
 -rwxr-xr-x  1 root root 47966110 Sep  7 11:12 webhooks*
 ```
 
-There are 
-
-__foghorn, gc-jobs,keeper,lighthouse-tekton-controller,webhooks.__
-
-next , building container images ,then deploying tekton  with helm
-# build images 
-the controller Dockerfile
-using ubuntu18.04 as base image
+Next , building container images, then deploying tekton  with helm
+# Build container images 
+The foghorn Dockerfile
+Using ubuntu18.04 as base image
 
 ```
 FROM ubuntu:18.04
@@ -98,29 +97,47 @@ ENV JX_HOME /jxhome
 ENTRYPOINT ["/foghorn"]
 ```
 
+```
+docker build -f Dockerfile_foghorn -t lighthouse-foghorn:0.0.738 .
+```
+
+
+
 Other dockerfile is similar.
 
-Here is an example of what I used,You can refer to the following link:https://github.com/yyunk/jenkins-x-arm-support/tree/master/doc/lighthouse
+Here is an example of what I used,You can refer to the following link: https://github.com/yyunk/jenkins-x-arm-support/tree/master/doc/lighthouse
 
-# deploy on cluster
+You should build container images by binary files which are built by source code.
+
+I built these container images:
+
+```
+lighthouse-lighthouse-tekton-controller:0.0.738
+lighthouse-webhooks:0.0.738
+lighthouse-keeper:0.0.738
+lighthouse-foghorn:0.0.738
+lighthouse-gc-jobs:0.0.738
+```
+
+# Deploy on cluster
 
 ```
 git clone https://github.com/jenkins-x/lighthouse/tree/master/charts/lighthouse
 cd lighthouse/charts
 ```
 
-change the values.yaml,modify that yaml file to use the container image you build.
+Change the values.yaml,modify that yaml file to use the container image you build.
 
-Here is an example of what I used in my arm64 server.You can refer to the following link
+Here is an example of what I used in my arm64 server. You can refer to the following link
 
-https://github.com/yyunk/jenkins-x-arm-support/blob/master/yaml/lighthouse-myvalues.yaml
+https://github.com/yyunk/jenkins-x-arm-support/blob/master/doc/lighthouse/myvalues.yaml
 
 Then run:
 
 `helm upgrade lighthouse lighthouse --install --values myvalues.yaml`
 
 # Success criteria
-is when both helm charts can be installed and the `Deployment` resources create pods which startup, start Running and don't fail / restart for 5 minutes. That means that the pods startup and don't fail basically.
+When helm charts can be installed, the pods' status are Running and don't fail / restart for 5 minutes. That means that the pods startup and don't fail basically.
 You can use command to see it 
 
 `kubectl get pod -w`
