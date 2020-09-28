@@ -118,7 +118,7 @@ RUN mkdir /ko-app
 COPY ./pipeline  /ko-app/controller
 ENTRYPOINT ["/ko-app/controller"]
 ```
-`docker build -f Dockerfile_controller -t controller:0.15.2-arm64 .`
+```docker build -f Dockerfile_controller -t controller:0.15.2-arm64 .```
 Other dockerfiles are similar.
 
 Here is an example of what I used, You can refer to the following link: https://github.com/yyunk/jenkins-x-arm-support/tree/master/doc/pipeline
