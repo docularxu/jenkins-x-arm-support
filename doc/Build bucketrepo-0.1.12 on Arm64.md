@@ -1,26 +1,22 @@
-
-
-# create bucketrepo container image
+# Create bucketrepo container image
 
 This document describes how to build Bucketrepo-0.1.12 on Arm64.
 
-The main reference is the build instruction in 
+The major reference is the build instruction in 
 
-https://github.com/jenkins-x/bucketrepo
-
-which is written for and verified on x86-64.
+https://github.com/jenkins-x/bucketrepo which is written for and verified on x86-64.
 
 # Environment
 
-The build is run natively on Arm64 machines.   The server used is:   
+The build is run natively on aarch64 machines. The server used is:   
 
--Memory : 32 G  
+- Memory : 32 G  
 
- -CPU: 32 cores  
+- CPU: 32 cores  
 
 # prerequisites
 
-- install go  version>=1.13.8
+- install go version>=1.13.8
 
   For arm64, follow this link to download Go 1.13.8 
 
@@ -40,10 +36,12 @@ The build is run natively on Arm64 machines.   The server used is:
 
 - update go proxy and environment
 
-  If your area can not access Google,you should set go proxy
+  Optionally, set up GOPROXY suitable to your development environment.
 
-  `$ go env -w GO111MODULE=on`
-  `$ go env -w GOPROXY=https://goproxy.io,direct`
+  ```
+  $ go env -w GO111MODULE=on
+  $ go env -w GOPROXY=https://goproxy.io,direct
+  ```
 
 - set GOPATH
 
@@ -52,8 +50,8 @@ The build is run natively on Arm64 machines.   The server used is:
 # Build Bucketrepo
 
 ```
-git clone https://github.com/jenkins-x/bucketrepo.git
-make build  
+$ git clone https://github.com/jenkins-x/bucketrepo.git
+$ make build  
 CGO_ENABLED=0 GO111MODULE=on go build -ldflags '' -o bin/bucketrepo ./internal
 go: downloading gocloud.dev v0.0.0-20200414034852-8076239640d2
 go: downloading github.com/TV4/logrus-stackdriver-formatter v0.1.0
@@ -86,21 +84,21 @@ go: finding k8s.io/client-go v11.0.0+incompatible
 go: finding golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5
 ```
 
-Now,the binary files are built in folder __bin__.you can see it .
+Now, the binary files are built in folder `bin`. you can see it.
 
 ```
-ls -l bin
+$ ls -l bin
 total 28036
 -rwxr-xr-x 1 root root 28706255 Sep 22 11:13 bucketrepo
 ```
 
 Now, bucketrepo binary file has been built.
 
-next , building container images ,then deploying bucketrepo with helm.
+Next, building container images, then deploying bucketrepo with helm.
 
-# build images 
+# Build container images 
 
-the buckerrepo dockerfile
+The buckerrepo dockerfile
 
 ```dockerfile
 FROM alpine:latest
@@ -110,27 +108,30 @@ COPY ./bin/ /
 ENTRYPOINT ["/bucketrepo"]
 ```
 
-Here is an example of what I used,You can refer to the following link:https://github.com/yyunk/jenkins-x-arm-support/tree/master/doc/bucketrepo
+```
+$ docker build -t buckerrepo:0.1.12 .
+```
+
+
+Here is an example of what I used, You can refer to the following link: https://github.com/yyunk/jenkins-x-arm-support/tree/master/doc/bucketrepo
 
 # deploy on cluster
 
-the chart is in the charts folde: https://github.com/jenkins-x/bucketrepo/tree/master/charts/bucketrepo
+Deployment is based on Helm. Helm chart can be found here: https://github.com/jenkins-x/bucketrepo/tree/master/charts/bucketrepo
 
-change the values.yaml,modify that yaml file to use the container image you build.
+Change the values.yaml, modify that yaml file to use the container image you build.
 
-Here is an example of what I used in my arm64 server.You can refer to the following link:https://github.com/yyunk/jenkins-x-arm-support/blob/master/doc/bucketrepo/myvalues.yaml
+Here is an example of what I used in my arm64 server. You can refer to the following link: https://github.com/yyunk/jenkins-x-arm-support/blob/master/doc/bucketrepo/myvalues.yaml
 
 Then run:
 
-`helm upgrade buckerrepo buckerrepo --install --values myvalues.yaml`
+`$ helm upgrade buckerrepo buckerrepo --install --values myvalues.yaml`
 
 # Success criteria
 
-is when both helm charts can be installed and the `Deployment` resources create pods which startup, start Running and don't fail / restart for 5 minutes. That means that the pods startup and don't fail basically.
+When helm charts can be installed, the pod's status is Running and don't fail / restart for 5 minutes. That means that the pods startup and don't fail basically. You can use command to see it
 
-You can use command to see it 
-
-`kubectl get pod -w`
+`$ kubectl get pod -w`
 
 ```
 bucketrepo-bucketrepo-66d8b58975-v52ng                       1/1     Running            1          1h
