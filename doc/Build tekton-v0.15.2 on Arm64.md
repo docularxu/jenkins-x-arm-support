@@ -62,7 +62,7 @@ Here is an example of what I changed in the Makefile. You can refer to the follo
 
 ## Start the build
 
-After changing the Makefile, you can enter the cmd folder, then you can see folders.
+After changing the Makefile, you can enter the `cmd` folder, then you can see folders.
 
 __controller, creds-init, entrypoint, git-init, imagedigestexporter, kubeconfigwriter, nop, pullrequest-init, webhook.__
 
@@ -105,7 +105,7 @@ There are
 
 * pipeline/vendor/github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/cmd/gcs-fetcher/.bin/github.com/tektoncd/pipeline
 
-next, building container images, then deploying tekton with helm.
+Next, building container images, then deploying tekton with helm.
 
 # Build container images 
 The controller Dockerfile
@@ -117,8 +117,8 @@ RUN  apt-get update &&  apt install openssh-client git -y
 RUN mkdir /ko-app
 COPY ./pipeline  /ko-app/controller
 ENTRYPOINT ["/ko-app/controller"]
-````
-
+```
+`docker build -f Dockerfile_controller -t controller:0.15.2-arm64 .`
 Other dockerfiles are similar.
 
 Here is an example of what I used, You can refer to the following link: https://github.com/yyunk/jenkins-x-arm-support/tree/master/doc/pipeline
