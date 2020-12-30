@@ -11,8 +11,12 @@ The major references of this document are :
 The build is run natively on aarch64 machines. The server used is :
 
 - Memory : 32 G
-
 - CPU : 32 cores
+
+* kubectl version: v1.18.6 
+
+* OS: Linux version 4.15.0-128-generic (buildd@bos02-arm64-005) (gcc version 7.5.0 (Ubuntu/Linaro 7.5.0-3ubuntu1~18.04))
+* The kubernetes cluster has one master and two workers.
 
 # Prerequisites
 * install go version >= 1.13.8
@@ -108,8 +112,10 @@ There are
 Next, building container images, then deploying tekton with helm.
 
 # Build container images 
-The controller Dockerfile
-Using ubuntu18.04 as base image
+
+Enter the folder of each component separately, run command docker build.
+
+* The controller Dockerfile Using ubuntu18.04 as base image
 
 ```
 FROM ubuntu:18.04
@@ -120,8 +126,115 @@ ENTRYPOINT ["/ko-app/controller"]
 ```
 ```docker build -f Dockerfile_controller -t controller:0.15.2-arm64 .```    
 
-Other dockerfiles are similar.
-Here is an example of what I used, You can refer to the following link: https://github.com/yyunk/jenkins-x-arm-support/tree/master/doc/pipeline
+* The creds-init Dockerfile Using ubuntu18.04 as base image 
+
+```
+FROM ubuntu:18.04
+RUN  apt-get update &&  apt install openssh-client  git -y
+RUN mkdir /ko-app
+COPY ./pipeline /ko-app/creds-init
+ENTRYPOINT ["/ko-app/creds-init"]
+```
+
+```docker build -f Dockerfile_creds-init -t creds-init:0.15.2-arm64 .```    
+
+* The entrypoint Dockerfile Using ubuntu18.04 as base image 
+
+```
+FROM ubuntu:18.04
+RUN  apt-get update &&  apt install openssh-client  git -y
+RUN mkdir /ko-app
+COPY ./pipeline /ko-app/entrypoint
+ENTRYPOINT ["/ko-app/entrypoint"]
+```
+
+```docker build -f Dockerfile_entrypoint -t entrypoint:0.15.2-arm64 .```
+
+* The gcs-fetcher Dockerfile Using ubuntu18.04 as base image 
+
+```
+FROM ubuntu:18.04
+RUN  apt-get update &&  apt install openssh-client git -y
+RUN mkdir /ko-app
+COPY ./pipeline /ko-app/gcs-fetcher
+ENTRYPOINT ["/ko-app/gcs-fetcher"]
+```
+
+```docker build -f Dockerfile_gcs-fetcher -t gcs-fetcher:0.15.2-arm64 .```
+
+* The git-init Dockerfile Using ubuntu18.04 as base image 
+
+```
+FROM ubuntu:18.04
+RUN  apt-get update &&  apt install openssh-client git -y
+RUN mkdir /ko-app
+COPY ./pipeline /ko-app/git-init
+ENV KO_DATA_PATH /var/run/ko
+ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/ko-app
+ENTRYPOINT ["/ko-app/git-init"]
+```
+
+```docker build -f Dockerfile_git-init -t git-init:0.15.2-arm64 .```
+
+* The imagedigestexporter Dockerfile Using ubuntu18.04 as base image
+
+```
+FROM ubuntu:18.04
+RUN  apt-get update &&  apt install openssh-client git -y
+RUN mkdir /ko-app
+COPY ./pipeline /ko-app/imagedigestexporter
+ENTRYPOINT ["/ko-app/imagedigestexporter"]
+```
+
+```docker build -f Dockerfile_imagedigestexporter -t imagedigestexporter:0.15.2-arm64 .```
+
+* The kubeconfigwriter Dockerfile Using ubuntu18.04 as base image
+
+```
+FROM ubuntu:18.04
+RUN  apt-get update &&  apt install openssh-client git -y
+RUN mkdir /ko-app
+COPY ./pipeline /ko-app/kubeconfigwriter
+ENTRYPOINT ["/ko-app/kubeconfigwriter"]
+```
+
+```docker build -f Dockerfile_kubeconfigwriter -t kubeconfigwriter:0.15.2-arm64 .```
+
+* The nop Dockerfile Using ubuntu18.04 as base image
+
+```
+FROM ubuntu:18.04
+RUN  apt-get update &&  apt install openssh-client git -y
+RUN mkdir /ko-app
+COPY ./pipeline /ko-app/nop
+ENTRYPOINT ["/ko-app/nop"]
+```
+
+```docker build -f Dockerfile_nop -t nop:0.15.2-arm64 .```
+
+* The pullrequest-init Dockerfile Using ubuntu18.04 as base image
+
+```
+FROM ubuntu:18.04
+RUN  apt-get update &&  apt install openssh-client git -y
+RUN mkdir /ko-app
+COPY ./pipeline /ko-app/pullrequest-init
+ENTRYPOINT ["/ko-app/pullrequest-init"]
+```
+
+```docker build -f Dockerfile_pullrequest-init -t pullrequest-init:0.15.2-arm64 .```
+
+* The webhook Dockerfile Using ubuntu18.04 as base image
+
+```
+FROM ubuntu:18.04
+RUN  apt-get update &&  apt install openssh-client git -y
+RUN mkdir /ko-app
+COPY ./pipeline /ko-app/webhook
+ENTRYPOINT ["/ko-app/webhook"]
+```
+
+```docker build -f Dockerfile_webhook -t webhook:0.15.2-arm64 .```
 
 You should build container images by binary files which are built by source code.
 
@@ -167,6 +280,8 @@ Here is an example of what I used in my arm64 server. You can refer to the follo
 
 https://github.com/yyunk/jenkins-x-arm-support/blob/master/doc/pipeline/myvalues.yaml
 
+Generally, you just modify the upstreamtag to the tag of the images you built before.
+
 `$ helm upgrade tekton tekton --install --values myvalues.yaml`
 
 # Success criteria
@@ -175,9 +290,12 @@ You can use command to see it.
 
 `$ kubectl get pod -w` 
 
-```
+```visual basic
 tekton-pipelines-controller-68487d8d5c-f6q5g                 1/1     Running            0          1h
-tekton-pipelines-webhook-6cff968fb9-6b6rm                    1/1     Running            0         1h
-
+tekton-pipelines-webhook-6cff968fb9-6b6rm                    1/1     Running            0          1h
 ```
+
+# Possible problems
+
+If you do not modify the makefile, maybe you can not build the pipeline successfully. There may be error of missing other golang file. 
 

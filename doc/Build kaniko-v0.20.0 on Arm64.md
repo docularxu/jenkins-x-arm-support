@@ -7,8 +7,12 @@ This document describes how to build kaniko-v0.20.0 on Arm64  from  the followin
 The build is run natively on Arm64 machines. The server used is :   
 
 - Memory : 32 G  
-
 - CPU: 32 cores  
+
+* kubectl version: v1.18.6 
+
+* OS: Linux version 4.15.0-128-generic (buildd@bos02-arm64-005) (gcc version 7.5.0 (Ubuntu/Linaro 7.5.0-3ubuntu1~18.04))
+* The kubernetes cluster has one master and two workers.
 
 # Prerequisites
 
@@ -53,9 +57,9 @@ GOARCH=amd64 GOOS=linux CGO_ENABLED=0 go build -ldflags '-extldflags "-static" -
 ...
 ```
 
-Now, the binary files are built in folder `out`. You can see it .
+if successfully, the folder `out` will be generated, the binary file has been built in folder `out`. You can see it .
 
-```
+```shell
 $ ls out -l
 total 49532
 -rwxr-xr-x 1 root root 50720768 Sep 22 11:25 executor
@@ -79,4 +83,8 @@ WORKDIR /workspace
 ENTRYPOINT ["/kaniko/executor"]
 ```
 
-Here is an example of what I used, you can refer to the following link:https://github.com/yyunk/jenkins-x-arm-support/blob/master/doc/knaiko/Dockerfile_kaniko
+`docker build -t kaniko:arm64 .`
+
+The kaniko is only used to build container image, you can from the url to test it.
+
+https://github.com/GoogleContainerTools/kaniko

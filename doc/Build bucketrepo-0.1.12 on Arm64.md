@@ -11,8 +11,12 @@ https://github.com/jenkins-x/bucketrepo which is written for and verified on x86
 The build is run natively on aarch64 machines. The server used is:   
 
 - Memory : 32 G  
-
 - CPU: 32 cores  
+
+* kubectl version: v1.18.6 
+
+* OS: Linux version 4.15.0-128-generic (buildd@bos02-arm64-005) (gcc version 7.5.0 (Ubuntu/Linaro 7.5.0-3ubuntu1~18.04))
+* The kubernetes cluster has one master and two workers.
 
 # prerequisites
 
@@ -84,7 +88,7 @@ go: finding k8s.io/client-go v11.0.0+incompatible
 go: finding golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5
 ```
 
-Now, the binary files are built in folder `bin`. you can see it.
+if successfully, the folder `bin` will be generated, and the binary file has been built in folder `bin`. you can see it.
 
 ```
 $ ls -l bin
@@ -112,9 +116,6 @@ ENTRYPOINT ["/bucketrepo"]
 $ docker build -t buckerrepo:0.1.12 .
 ```
 
-
-Here is an example of what I used, You can refer to the following link: https://github.com/yyunk/jenkins-x-arm-support/tree/master/doc/bucketrepo
-
 # Deploy on cluster
 
 Deployment is based on Helm. Helm chart can be found here: https://github.com/jenkins-x/bucketrepo/tree/master/charts/bucketrepo
@@ -122,6 +123,8 @@ Deployment is based on Helm. Helm chart can be found here: https://github.com/je
 Change the `values.yaml`, modify that yaml file to use the container image you build.
 
 Here is an example of what I used in my arm64 server. You can refer to the following link: https://github.com/yyunk/jenkins-x-arm-support/blob/master/doc/bucketrepo/myvalues.yaml
+
+Generally, you just need to modify the repo and tag in the value.yaml with you built before.
 
 Then run:
 
@@ -133,11 +136,7 @@ When helm charts can be installed, the pod's status is Running and don't fail / 
 
 `$ kubectl get pod -w`
 
-```
+```shell
 bucketrepo-bucketrepo-66d8b58975-v52ng                       1/1     Running            1          1h
 ```
-
-
-
-
 
